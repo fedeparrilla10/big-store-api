@@ -124,7 +124,7 @@ describe("/products", () => {
     expect(response.body).toMatchObject({ price: 20, status: "active" });
     expect(db.update).toHaveBeenCalledWith({
       where: { id, deletedAt: null },
-      data: { priceCents: 2000n, status: "active" },
+      data: { sku: undefined, name: undefined, priceCents: 2000n, status: "active" },
     });
   });
 

@@ -29,15 +29,6 @@ function toResponse(product: {
   };
 }
 
-function toData(input: Partial<ProductInput>) {
-  return {
-    ...(input.sku !== undefined && { sku: input.sku }),
-    ...(input.name !== undefined && { name: input.name }),
-    ...(input.status !== undefined && { status: input.status }),
-    ...(input.price !== undefined && { priceCents: BigInt(Math.round(input.price * 100)) }),
-  };
-}
-
 export async function createProduct(input: ProductInput) {
   const product = await prisma.product.create({
     data: {
@@ -51,19 +42,31 @@ export async function createProduct(input: ProductInput) {
 }
 
 export async function listProducts() {
-  const products = await prisma.product.findMany({ where: { deletedAt: null } });
+  const products = await prisma.product.findMany({
+    where: { deletedAt: null },
+  });
   return products.map(toResponse);
 }
 
 export async function getProduct(id: string) {
-  const product = await prisma.product.findFirst({ where: { id, deletedAt: null } });
+  const product = await prisma.product.findFirst({
+    where: { id, deletedAt: null },
+  });
   return product ? toResponse(product) : null;
 }
 
 export async function updateProduct(id: string, input: Partial<ProductInput>) {
   const product = await prisma.product.update({
     where: { id, deletedAt: null },
-    data: toData(input),
+    data: {
+      sku: input.sku,
+      name: input.name,
+      status: input.status,
+      priceCents:
+        input.price === undefined
+          ? undefined
+          : BigInt(Math.round(input.price * 100)),
+    },
   });
   return toResponse(product);
 }
