@@ -17,6 +17,11 @@
 - Apply these rules to new code; adapt existing code only when the current feature requires it.
 - Use ECMAScript modules and TypeScript; avoid CommonJS, Babel, or other transpilers.
 - Use arrow functions instead of `function` declarations; use `const` instead of `let` when possible.
+- All tables in the database must have timestamps, both `createdAt` and `updatedAt`.
+
+## Commits
+
+- Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages.
 
 ## Tests
 
