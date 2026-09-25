@@ -1,21 +1,29 @@
 # Bigstore API
 
-API básica con Node.js, Express y TypeScript. Requiere Node.js 20 o superior.
+Basic API built with Node.js, Express, and TypeScript. Requires Node.js 22.12 or later on a supported even-numbered release.
 
-## Uso
+## Usage
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
-La API estará disponible en `http://localhost:3000`. Comprueba su estado en `GET /health`.
+The API will be available at `http://localhost:3000`. Check its status at `GET /health`.
 
-## Comandos
+## Commands
 
-- `pnpm run dev`: desarrollo con recarga automática.
-- `pnpm run typecheck`: comprueba los tipos.
-- `pnpm run build`: compila a `dist/`.
-- `pnpm start`: ejecuta la versión compilada.
+- `pnpm run dev`: development with automatic reloads.
+- `pnpm run typecheck`: checks types.
+- `pnpm run build`: compiles to `dist/`.
+- `pnpm start`: runs the compiled version.
+- `pnpm test`: runs tests with Vitest and Supertest.
+- `pnpm run db:generate`: generates the Prisma client.
 
-Para cambiar el puerto, define la variable de entorno `PORT`.
+To change the port, set the `PORT` environment variable.
+
+## Database
+
+Prisma is configured for PostgreSQL in `prisma/schema.prisma`. Copy `.env.example` to `.env` and set `DATABASE_URL` to your local credentials before using the database. `.env` is not tracked by Git.
+
+There are no models or migrations yet. Generating the client does not apply changes to PostgreSQL.
