@@ -16,6 +16,45 @@ model Product {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
+  orderItems OrderItem[]
 
   @@map("products")
+}
+
+model Company {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  orders    Order[]
+
+  @@map("companies")
+}
+
+model Order {
+  id         String      @id @default(uuid()) @db.Uuid
+  companyId  String      @db.Uuid
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  status     String      @default("pending")
+  totalCents BigInt
+  createdAt  DateTime    @default(now())
+  items      OrderItem[]
+
+  @@index([companyId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String  @id @default(uuid()) @db.Uuid
+  orderId        String  @db.Uuid
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  productId      String  @db.Uuid
+  product        Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  sku            String
+  productName    String
+  quantity       Int
+  unitPriceCents BigInt
+
+  @@unique([orderId, productId])
+  @@index([productId])
+  @@map("order_items")
 }
