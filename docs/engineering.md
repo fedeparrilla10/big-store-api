@@ -6,6 +6,7 @@
 - For example, `src/modules/products/` might contain `products.routes.ts`, `products.controller.ts`, and `products.service.ts`; add `products.repository.ts` only if persistence is needed. These names illustrate responsibilities; they do not require creating every file.
 - Use `src/app.ts` to configure Express and mount routes; `src/index.ts` only starts the server. Keep business logic out of these files.
 - Keep controllers responsible for HTTP (requests and responses) and business rules in the module, separate from the transport layer when there is enough logic to justify it.
+- Types and interfaces should be defined in the module that uses them; extract shared types only when they are actually reused. Put them in `src/types/` only if they are used across multiple modules.
 
 ## Conventions
 
@@ -14,9 +15,10 @@
 - Keep persistence and integration code close to the module that uses it; extract shared code only when it is actually reused.
 - Add tests for business rules and relevant error cases for each change; run `pnpm run typecheck` and `pnpm run build` before delivery.
 - Apply these rules to new code; adapt existing code only when the current feature requires it.
+- Use ECMAScript modules and TypeScript; avoid CommonJS, Babel, or other transpilers.
+- Use arrow functions instead of `function` declarations; use `const` instead of `let` when possible.
 
 ## Tests
 
 - Full suite: `pnpm test`.
 - Typecheck: `pnpm run typecheck`.
-- Linter: no command is defined.

@@ -8,3 +8,7 @@ pnpm --dir bigstore-api build
 pnpm --dir bigstore-api start
 ``
 ```
+
+## Conventions
+
+To check code conventions and architecture rules, check `docs/ENGINEERING.md`.
