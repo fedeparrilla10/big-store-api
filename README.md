@@ -21,9 +21,3 @@ The API will be available at `http://localhost:3000`. Check its status at `GET /
 - `pnpm run db:generate`: generates the Prisma client.
 
 To change the port, set the `PORT` environment variable.
-
-## Database
-
-Prisma is configured for PostgreSQL in `prisma/schema.prisma`. Copy `.env.example` to `.env` and set `DATABASE_URL` to your local credentials before using the database. `.env` is not tracked by Git.
-
-There are no models or migrations yet. Generating the client does not apply changes to PostgreSQL.
