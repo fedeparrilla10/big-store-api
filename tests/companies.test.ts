@@ -112,6 +112,7 @@ describe("/companies", () => {
 
   it("rejects malformed IDs", async () => {
     expect((await request(app).get("/companies/invalid")).status).toBe(400);
+    expect((await request(app).get("/companies/a1498994-7b18-4ad3-0a69-7966ef8b907b")).status).toBe(400);
     expect((await request(app).patch("/companies/invalid").send({ name: "Nueva" })).status).toBe(400);
     expect((await request(app).delete("/companies/invalid")).status).toBe(400);
     expect(db.findUnique).not.toHaveBeenCalled();

@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { z } from "zod";
+import { idSchema } from "../../shared/id.schema";
 import * as products from "./products.service";
 
 const productSchema = z.strictObject({
@@ -18,10 +19,6 @@ const productSchema = z.strictObject({
 const updateSchema = productSchema
   .partial()
   .refine((input) => Object.keys(input).length > 0);
-
-const idSchema = z
-  .string()
-  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 const handleError = (error: unknown, res: Response) => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

@@ -1,13 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { z } from "zod";
+import { idSchema } from "../../shared/id.schema";
 import * as companies from "./companies.service";
 
 const companySchema = z.strictObject({ name: z.string().trim().min(1) });
-
-const idSchema = z
-  .string()
-  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 const handleError = (error: unknown, res: Response) => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

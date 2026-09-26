@@ -183,6 +183,7 @@ describe("/products", () => {
 
   it("rejects malformed IDs and empty updates", async () => {
     expect((await request(app).get("/products/not-a-uuid")).status).toBe(400);
+    expect((await request(app).get("/products/a1498994-7b18-4ad3-0a69-7966ef8b907b")).status).toBe(400);
     expect((await request(app).delete("/products/not-a-uuid")).status).toBe(
       400,
     );

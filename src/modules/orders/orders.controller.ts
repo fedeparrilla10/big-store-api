@@ -1,9 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { z } from "zod";
+import { idSchema } from "../../shared/id.schema";
 import * as orders from "./orders.service";
-
-const idSchema = z.uuid();
 
 const createSchema = z.strictObject({
   companyId: idSchema,
