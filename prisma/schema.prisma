@@ -12,7 +12,7 @@ model Product {
   sku        String    @unique
   name       String
   status     String    @default("inactive")
-  priceCents BigInt
+  price      Decimal   @db.Decimal(16, 2)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
@@ -36,8 +36,10 @@ model Order {
   companyId  String      @db.Uuid
   company    Company     @relation(fields: [companyId], references: [id], onDelete: Restrict)
   status     String      @default("pending")
-  totalCents BigInt
+  total      Decimal     @db.Decimal(30, 2)
   createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  deletedAt  DateTime?
   items      OrderItem[]
 
   @@index([companyId])
@@ -53,7 +55,9 @@ model OrderItem {
   sku            String
   productName    String
   quantity       Int
-  unitPriceCents BigInt
+  unitPrice      Decimal @db.Decimal(16, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([orderId, productId])
   @@index([productId])

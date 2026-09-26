@@ -15,7 +15,7 @@ const updateSchema = productSchema.partial().refine((input) => Object.keys(input
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
-function handleError(error: unknown, res: Response) {
+const handleError = (error: unknown, res: Response) => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === "P2002") {
       res.status(409).json({ error: "No se puede guardar el producto porque este SKU ya está utilizado" });
@@ -27,9 +27,9 @@ function handleError(error: unknown, res: Response) {
     }
   }
   res.status(500).json({ error: "Error interno del servidor" });
-}
+};
 
-export async function create(req: Request, res: Response) {
+export const create = async (req: Request, res: Response) => {
   const input = productSchema.safeParse(req.body);
   if (!input.success) return res.status(400).json({ error: "Datos de producto inválidos" });
   try {
@@ -37,17 +37,17 @@ export async function create(req: Request, res: Response) {
   } catch (error) {
     handleError(error, res);
   }
-}
+};
 
-export async function list(_req: Request, res: Response) {
+export const list = async (_req: Request, res: Response) => {
   try {
     return res.json(await products.listProducts());
   } catch (error) {
     handleError(error, res);
   }
-}
+};
 
-export async function get(req: Request, res: Response) {
+export const get = async (req: Request, res: Response) => {
   if (!idSchema.safeParse(req.params.id).success) return res.status(400).json({ error: "ID de producto inválido" });
   try {
     const product = await products.getProduct(req.params.id);
@@ -56,9 +56,9 @@ export async function get(req: Request, res: Response) {
   } catch (error) {
     handleError(error, res);
   }
-}
+};
 
-export async function update(req: Request, res: Response) {
+export const update = async (req: Request, res: Response) => {
   if (!idSchema.safeParse(req.params.id).success) return res.status(400).json({ error: "ID de producto inválido" });
   const input = updateSchema.safeParse(req.body);
   if (!input.success) return res.status(400).json({ error: "Datos de producto inválidos" });
@@ -67,9 +67,9 @@ export async function update(req: Request, res: Response) {
   } catch (error) {
     handleError(error, res);
   }
-}
+};
 
-export async function remove(req: Request, res: Response) {
+export const remove = async (req: Request, res: Response) => {
   if (!idSchema.safeParse(req.params.id).success) return res.status(400).json({ error: "ID de producto inválido" });
   try {
     if (!await products.deleteProduct(req.params.id)) {
@@ -79,4 +79,4 @@ export async function remove(req: Request, res: Response) {
   } catch (error) {
     handleError(error, res);
   }
-}
+};

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,72 +9,69 @@ export type ProductInput = {
   status?: "active" | "inactive";
 };
 
-function toResponse(product: {
+const toResponse = (product: {
   id: string;
   sku: string;
   name: string;
   status: string;
-  priceCents: bigint;
+  price: Prisma.Decimal;
   createdAt: Date;
   updatedAt: Date;
-}) {
+}) => {
   return {
     id: product.id,
     sku: product.sku,
     name: product.name,
     status: product.status,
-    price: Number(product.priceCents) / 100,
+    price: product.price,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
   };
-}
+};
 
-export async function createProduct(input: ProductInput) {
+export const createProduct = async (input: ProductInput) => {
   const product = await prisma.product.create({
     data: {
       sku: input.sku,
       name: input.name,
-      priceCents: BigInt(Math.round(input.price * 100)),
+      price: input.price,
       ...(input.status !== undefined && { status: input.status }),
     },
   });
   return toResponse(product);
-}
+};
 
-export async function listProducts() {
+export const listProducts = async () => {
   const products = await prisma.product.findMany({
     where: { deletedAt: null },
   });
   return products.map(toResponse);
-}
+};
 
-export async function getProduct(id: string) {
+export const getProduct = async (id: string) => {
   const product = await prisma.product.findFirst({
     where: { id, deletedAt: null },
   });
   return product ? toResponse(product) : null;
-}
+};
 
-export async function updateProduct(id: string, input: Partial<ProductInput>) {
+export const updateProduct = async (id: string, input: Partial<ProductInput>) => {
   const product = await prisma.product.update({
     where: { id, deletedAt: null },
     data: {
       sku: input.sku,
       name: input.name,
       status: input.status,
-      priceCents:
-        input.price === undefined
-          ? undefined
-          : BigInt(Math.round(input.price * 100)),
+      price: input.price,
     },
   });
   return toResponse(product);
-}
+};
 
-export async function deleteProduct(id: string) {
+export const deleteProduct = async (id: string) => {
   const result = await prisma.product.updateMany({
     where: { id, deletedAt: null },
     data: { deletedAt: new Date() },
   });
   return result.count > 0;
-}
+};

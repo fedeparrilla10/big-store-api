@@ -30,7 +30,7 @@ const row = {
   sku: "ABC-1",
   name: "Camiseta",
   status: "inactive",
-  priceCents: 1599n,
+  price: new Prisma.Decimal("15.99"),
   createdAt: new Date("2026-01-01T00:00:00Z"),
   updatedAt: new Date("2026-01-01T00:00:00Z"),
   deletedAt: null,
@@ -40,7 +40,7 @@ const product = {
   sku: "ABC-1",
   name: "Camiseta",
   status: "inactive",
-  price: 15.99,
+  price: "15.99",
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
 };
@@ -48,7 +48,7 @@ const product = {
 beforeEach(() => vi.resetAllMocks());
 
 describe("/products", () => {
-  it("creates a product with euros in the API and cents in the database", async () => {
+  it("creates a product with a decimal price", async () => {
     db.create.mockResolvedValue(row);
     const response = await request(app)
       .post("/products")
@@ -57,7 +57,7 @@ describe("/products", () => {
     expect(response.status).toBe(201);
     expect(response.body).toEqual(product);
     expect(db.create).toHaveBeenCalledWith({
-      data: { sku: "ABC-1", name: "Camiseta", priceCents: 1599n },
+      data: { sku: "ABC-1", name: "Camiseta", price: 15.99 },
     });
   });
 
@@ -113,7 +113,7 @@ describe("/products", () => {
   it("updates only a non-deleted product", async () => {
     db.update.mockResolvedValue({
       ...row,
-      priceCents: 2000n,
+      price: new Prisma.Decimal("20.00"),
       status: "active",
     });
     const response = await request(app)
@@ -121,10 +121,10 @@ describe("/products", () => {
       .send({ price: 20, status: "active" });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ price: 20, status: "active" });
+    expect(response.body).toMatchObject({ price: "20", status: "active" });
     expect(db.update).toHaveBeenCalledWith({
       where: { id, deletedAt: null },
-      data: { sku: undefined, name: undefined, priceCents: 2000n, status: "active" },
+      data: { sku: undefined, name: undefined, price: 20, status: "active" },
     });
   });
 
