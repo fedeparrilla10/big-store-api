@@ -7,6 +7,8 @@ export type OrderInput = {
   items: { productId: string; quantity: number }[];
 };
 
+export type OrderStatus = "pending" | "confirmed" | "cancelled";
+
 const toResponse = (
   order: Prisma.OrderGetPayload<{ include: { items: true } }>,
 ) => ({
@@ -90,7 +92,7 @@ export const getOrder = async (id: string) => {
   return order ? toResponse(order) : null;
 };
 
-export const updateOrder = async (id: string, status: string) => {
+export const updateOrder = async (id: string, status: OrderStatus) => {
   const order = await prisma.order.update({
     where: { id, deletedAt: null },
     data: { status },

@@ -1,43 +1,14 @@
-import { Prisma } from "@prisma/client";
-import { Request, Response } from "express";
-import { z } from "zod";
+import { NextFunction, Request, Response } from "express";
 import { idSchema } from "../../shared/id.schema";
+import { createOrderSchema, updateOrderSchema } from "./orders.schema";
 import * as orders from "./orders.service";
 
-const createSchema = z.strictObject({
-  companyId: idSchema,
-  items: z
-    .array(
-      z.strictObject({
-        productId: idSchema,
-        quantity: z.number().int().positive().max(2_147_483_647),
-      }),
-    )
-    .min(1)
-    .refine(
-      (items) =>
-        new Set(items.map((item) => item.productId)).size === items.length,
-    ),
-});
-
-const updateSchema = z.strictObject({
-  status: z.enum(["pending", "confirmed", "cancelled"]),
-});
-
-const handleError = (error: unknown, res: Response) => {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === "P2025")
-      return res.status(404).json({ error: "Pedido no encontrado" });
-    if (error.code === "P2003")
-      return res
-        .status(409)
-        .json({ error: "Empresa o producto ya no disponible" });
-  }
-  return res.status(500).json({ error: "Error interno del servidor" });
-};
-
-export const create = async (req: Request, res: Response) => {
-  const input = createSchema.safeParse(req.body);
+export const create = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const input = createOrderSchema.safeParse(req.body);
   if (!input.success)
     return res.status(400).json({ error: "Datos de pedido inválidos" });
   try {
@@ -52,19 +23,23 @@ export const create = async (req: Request, res: Response) => {
     }
     return res.status(201).json(result.order);
   } catch (error) {
-    return handleError(error, res);
+    next(error);
   }
 };
 
-export const list = async (_req: Request, res: Response) => {
+export const list = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     return res.json(await orders.listOrders());
   } catch (error) {
-    return handleError(error, res);
+    next(error);
   }
 };
 
-export const get = async (req: Request, res: Response) => {
+export const get = async (req: Request, res: Response, next: NextFunction) => {
   if (!idSchema.safeParse(req.params.id).success)
     return res.status(400).json({ error: "ID de pedido inválido" });
   try {
@@ -72,24 +47,32 @@ export const get = async (req: Request, res: Response) => {
     if (!order) return res.status(404).json({ error: "Pedido no encontrado" });
     return res.json(order);
   } catch (error) {
-    return handleError(error, res);
+    next(error);
   }
 };
 
-export const update = async (req: Request, res: Response) => {
+export const update = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   if (!idSchema.safeParse(req.params.id).success)
     return res.status(400).json({ error: "ID de pedido inválido" });
-  const input = updateSchema.safeParse(req.body);
+  const input = updateOrderSchema.safeParse(req.body);
   if (!input.success)
     return res.status(400).json({ error: "Datos de pedido inválidos" });
   try {
     return res.json(await orders.updateOrder(req.params.id, input.data.status));
   } catch (error) {
-    return handleError(error, res);
+    next(error);
   }
 };
 
-export const remove = async (req: Request, res: Response) => {
+export const remove = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   if (!idSchema.safeParse(req.params.id).success)
     return res.status(400).json({ error: "ID de pedido inválido" });
   try {
@@ -97,6 +80,6 @@ export const remove = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Pedido no encontrado" });
     return res.status(204).send();
   } catch (error) {
-    return handleError(error, res);
+    next(error);
   }
 };

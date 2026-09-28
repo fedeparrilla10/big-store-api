@@ -9,6 +9,8 @@ export type ProductInput = {
   status?: "active" | "inactive";
 };
 
+export type UpdateProductInput = Partial<ProductInput>;
+
 const toResponse = (product: {
   id: string;
   sku: string;
@@ -55,7 +57,7 @@ export const getProduct = async (id: string) => {
   return product ? toResponse(product) : null;
 };
 
-export const updateProduct = async (id: string, input: Partial<ProductInput>) => {
+export const updateProduct = async (id: string, input: UpdateProductInput) => {
   const product = await prisma.product.update({
     where: { id, deletedAt: null },
     data: {

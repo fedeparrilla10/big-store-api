@@ -93,7 +93,9 @@ describe("/companies", () => {
 
   it("returns 404 when updating a missing company", async () => {
     db.update.mockRejectedValue(prismaError("P2025"));
-    expect((await request(app).patch(`/companies/${id}`).send({ name: "Nueva" })).status).toBe(404);
+    const response = await request(app).patch(`/companies/${id}`).send({ name: "Nueva" });
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: "Recurso no encontrado" });
   });
 
   it("deletes a company, returning 404 if missing", async () => {
@@ -107,7 +109,7 @@ describe("/companies", () => {
     db.delete.mockRejectedValue(prismaError("P2003"));
     const response = await request(app).delete(`/companies/${id}`);
     expect(response.status).toBe(409);
-    expect(response.body.error).toMatch(/pedidos asociados/);
+    expect(response.body).toEqual({ error: "La operación entra en conflicto con datos existentes" });
   });
 
   it("rejects malformed IDs", async () => {

@@ -152,6 +152,18 @@ describe("/orders", () => {
     expect((await request(app).patch(`/orders/${orderId}`).send({ status: "cancelled" })).status).toBe(404);
   });
 
+  it("returns a generic conflict if a company or product disappears while creating", async () => {
+    db.company.findUnique.mockResolvedValue({ id: companyId });
+    db.product.findMany.mockResolvedValue([{ id: productId, sku: "ABC-1", name: "Camiseta", price: new Prisma.Decimal("15.99") }]);
+    db.order.create.mockRejectedValue(new Prisma.PrismaClientKnownRequestError("Foreign key", {
+      code: "P2003", clientVersion: "6.19.3",
+    }));
+
+    const response = await request(app).post("/orders").send(input);
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({ error: "La operación entra en conflicto con datos existentes" });
+  });
+
   it("soft deletes once and rejects invalid IDs", async () => {
     db.order.updateMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
     expect((await request(app).delete(`/orders/${orderId}`)).status).toBe(204);
